@@ -21,6 +21,7 @@ export default function App() {
         <div className="grid grid-cols-1 lg:grid-cols-[360px_minmax(0,1fr)] gap-5">
           <Sidebar
             valla={valla}
+            setValla={setValla}
             onImageSelected={setLogo}
             editMode={editMode}
             setEditMode={setEditMode}

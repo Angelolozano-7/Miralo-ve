@@ -1,9 +1,10 @@
+import { VALLAS, type Valla, type Point } from "../data/vallas";
 import Uploader from "./Uploader";
-import type { Valla, Point } from "../data/vallas";
 import { exportCanvasWithWatermark } from "../core/exportCanvas";
 
 type SidebarProps = {
   valla: Valla;
+  setValla: (v: Valla) => void;
   onImageSelected: (img: HTMLImageElement) => void;
   editMode: boolean;
   setEditMode: (v: boolean) => void;
@@ -12,6 +13,7 @@ type SidebarProps = {
 
 export default function Sidebar({
   valla,
+  setValla,
   onImageSelected,
   editMode,
   setEditMode,
@@ -32,10 +34,17 @@ export default function Sidebar({
         <label className="text-sm text-gray-400">Plantilla de valla</label>
         <select
           className="w-full bg-gray-800/80 text-gray-100 border border-gray-700 rounded-lg px-3 py-2 outline-none"
-          defaultValue={valla.id}
-          disabled
+          value={valla.id}
+          onChange={(e) => {
+            const nueva = VALLAS.find((v) => v.id === e.target.value);
+            if (nueva) setValla(nueva);
+          }}
         >
-          <option value={valla.id}>{valla.nombre}</option>
+          {VALLAS.map((v) => (
+            <option key={v.id} value={v.id}>
+              {v.nombre}
+            </option>
+          ))}
         </select>
       </div>
 
@@ -55,13 +64,6 @@ export default function Sidebar({
         />
         Modo editor (clic en 4 esquinas)
       </label>
-
-      {editMode && (
-        <div className="mt-3 text-xs text-gray-400">
-          <p>Orden: <b>TL → TR → BR → BL</b>.</p>
-          <p>Coords se guardan en consola; copia en vallas.ts</p>
-        </div>
-      )}
 
       {/* Botón exportar */}
       <div className="mt-5 flex gap-2">
