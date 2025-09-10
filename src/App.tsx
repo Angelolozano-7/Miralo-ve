@@ -7,6 +7,7 @@ import { VALLAS, type Valla, type Point } from "./data/vallas";
 export default function App() {
   const [logo, setLogo] = useState<HTMLImageElement | null>(null);
   const [editMode, setEditMode] = useState(false);
+  const [showQuad, setShowQuad] = useState(false);   // ← NUEVO
   const [valla, setValla] = useState<Valla>(VALLAS[0]);
 
   const handleQuadChange = (q: Point[]) => {
@@ -25,13 +26,15 @@ export default function App() {
             onImageSelected={setLogo}
             editMode={editMode}
             setEditMode={setEditMode}
-            onQuadChange={handleQuadChange}
+            showQuad={showQuad}            // ← NUEVO
+            setShowQuad={setShowQuad}      // ← NUEVO
           />
           <Preview
             valla={valla}
             userImg={logo}
             editMode={editMode}
             onQuadChange={handleQuadChange}
+            showQuad={showQuad}            // ← NUEVO
           />
         </div>
       </main>

@@ -1,5 +1,6 @@
-import { VALLAS, type Valla, type Point } from "../data/vallas";
+import { useState } from "react";
 import Uploader from "./Uploader";
+import { VALLAS, type Valla, type Point } from "../data/vallas";
 import { exportCanvasWithWatermark } from "../core/exportCanvas";
 
 type SidebarProps = {
@@ -8,7 +9,9 @@ type SidebarProps = {
   onImageSelected: (img: HTMLImageElement) => void;
   editMode: boolean;
   setEditMode: (v: boolean) => void;
-  onQuadChange: (q: Point[]) => void;
+  showQuad: boolean;
+  setShowQuad: (v: boolean) => void;
+  onQuadChange?: (q: Point[]) => void; // no se usa aquí, pero lo dejamos por si lo necesitas
 };
 
 export default function Sidebar({
@@ -17,12 +20,24 @@ export default function Sidebar({
   onImageSelected,
   editMode,
   setEditMode,
+  showQuad,
+  setShowQuad,
 }: SidebarProps) {
+  const [quality, setQuality] = useState(1);
+
   const handleExport = () => {
     const canvas = document.querySelector("canvas");
-    if (canvas) {
-      exportCanvasWithWatermark(canvas as HTMLCanvasElement);
-    }
+    if (!canvas) return;
+
+    // nombre con id de valla + timestamp
+    const ts = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+    const fileName = `sim_${valla.id}_${ts}`;
+
+    exportCanvasWithWatermark(canvas as HTMLCanvasElement, {
+      scale: quality,
+      fileName,
+      watermark: "Publilatina · Simulación",
+    });
   };
 
   return (
@@ -55,25 +70,52 @@ export default function Sidebar({
         <p className="text-xs text-gray-500">JPG/PNG hasta 8MB</p>
       </div>
 
-      {/* Editor toggle */}
-      <label className="flex items-center gap-2 text-sm text-gray-300">
-        <input
-          type="checkbox"
-          checked={editMode}
-          onChange={(e) => setEditMode(e.target.checked)}
-        />
-        Modo editor (clic en 4 esquinas)
-      </label>
+      {/* Toggles */}
+      <div className="space-y-2 mb-5">
+        <label className="flex items-center gap-2 text-sm text-gray-300">
+          <input
+            type="checkbox"
+            checked={editMode}
+            onChange={(e) => setEditMode(e.target.checked)}
+          />
+          Modo editor (clic en 4 esquinas)
+        </label>
 
-      {/* Botón exportar */}
-      <div className="mt-5 flex gap-2">
+        <label className="flex items-center gap-2 text-sm text-gray-300">
+          <input
+            type="checkbox"
+            checked={showQuad}
+            onChange={(e) => setShowQuad(e.target.checked)}
+          />
+          Ver contorno del área
+        </label>
+      </div>
+
+      {/* Exportación */}
+      <div className="mt-2 space-y-3">
+        <div className="flex items-center justify-between">
+          <label className="text-sm text-gray-400">Calidad de exportación</label>
+          <select
+            className="bg-gray-800/80 text-gray-100 border border-gray-700 rounded px-2 py-1"
+            value={quality}
+            onChange={(e) => setQuality(Number(e.target.value))}
+          >
+            <option value={1}>1x</option>
+            <option value={2}>2x</option>
+          </select>
+        </div>
+
         <button
           onClick={handleExport}
-          className="flex-1 bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-3 py-2 transition"
+          className="w-full bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-3 py-2 transition"
         >
           Descargar PNG
         </button>
       </div>
+
+      <p className="mt-4 text-[11px] leading-4 text-gray-500">
+        Privacidad: todo ocurre en tu navegador; no se sube nada.
+      </p>
     </aside>
   );
 }
