@@ -1,5 +1,6 @@
 import Uploader from "./Uploader";
 import type { Valla, Point } from "../data/vallas";
+import { exportCanvasWithWatermark } from "../core/exportCanvas";
 
 type SidebarProps = {
   valla: Valla;
@@ -14,12 +15,19 @@ export default function Sidebar({
   onImageSelected,
   editMode,
   setEditMode,
-  onQuadChange,
 }: SidebarProps) {
+  const handleExport = () => {
+    const canvas = document.querySelector("canvas");
+    if (canvas) {
+      exportCanvasWithWatermark(canvas as HTMLCanvasElement);
+    }
+  };
+
   return (
     <aside className="bg-gray-900 border border-gray-800 rounded-xl p-4 md:p-5 shadow-lg">
       <h2 className="text-white font-medium mb-3">Controles</h2>
 
+      {/* Selector de valla */}
       <div className="space-y-1 mb-4">
         <label className="text-sm text-gray-400">Plantilla de valla</label>
         <select
@@ -31,12 +39,14 @@ export default function Sidebar({
         </select>
       </div>
 
+      {/* Uploader */}
       <div className="space-y-2 mb-5">
         <label className="text-sm text-gray-400">Creativo / logo</label>
         <Uploader onImageSelected={onImageSelected} />
         <p className="text-xs text-gray-500">JPG/PNG hasta 8MB</p>
       </div>
 
+      {/* Editor toggle */}
       <label className="flex items-center gap-2 text-sm text-gray-300">
         <input
           type="checkbox"
@@ -49,9 +59,19 @@ export default function Sidebar({
       {editMode && (
         <div className="mt-3 text-xs text-gray-400">
           <p>Orden: <b>TL → TR → BR → BL</b>.</p>
-          <p>Al terminar, coords se guardan en consola para pegarlas en vallas.ts</p>
+          <p>Coords se guardan en consola; copia en vallas.ts</p>
         </div>
       )}
+
+      {/* Botón exportar */}
+      <div className="mt-5 flex gap-2">
+        <button
+          onClick={handleExport}
+          className="flex-1 bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-3 py-2 transition"
+        >
+          Descargar PNG
+        </button>
+      </div>
     </aside>
   );
 }
