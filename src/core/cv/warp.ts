@@ -10,6 +10,9 @@ async function imageToImageData(img: HTMLImageElement) {
   return ctx.getImageData(0, 0, off.width, off.height);
 }
 
+
+
+
 export async function warpAndCompose(
   canvas: HTMLCanvasElement,
   bgImg: HTMLImageElement,
@@ -18,7 +21,7 @@ export async function warpAndCompose(
   maskImg?: HTMLImageElement | null
 ) {
   const w = window as any;
-  const cv = w.cv as typeof import("opencv");
+  const cv = w.cv as any;
   const ctx = canvas.getContext("2d")!;
 
   canvas.width = bgImg.naturalWidth;
