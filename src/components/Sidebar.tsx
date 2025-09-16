@@ -18,13 +18,10 @@ export default function Sidebar({
   valla,
   setValla,
   onImageSelected,
-  editMode,
-  setEditMode,
   showQuad,
   setShowQuad,
 }: SidebarProps) {
   const [quality, setQuality] = useState(1);
-
   const handleExport = () => {
     const canvas = document.querySelector("canvas");
     if (!canvas) return;
