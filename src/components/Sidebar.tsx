@@ -1,17 +1,20 @@
 import { useState } from "react";
 import Uploader from "./Uploader";
 import { VALLAS, type Valla, type Point } from "../data/vallas";
-import { exportCanvasWithWatermark } from "../core/exportCanvas";
+import {
+  exportCanvasWithWatermarkDownload as exportCanvasWithWatermark,
+  exportCanvasWithWatermarkOpenInNewTab,
+} from "../core/exportCanvas";
 
 type SidebarProps = {
   valla: Valla;
   setValla: (v: Valla) => void;
   onImageSelected: (img: HTMLImageElement) => void;
-  editMode: boolean;
-  setEditMode: (v: boolean) => void;
+  editMode: boolean;               // recibido pero no utilizado aquí (mantén la prop si el padre la usa)
+  setEditMode: (v: boolean) => void; // idem
   showQuad: boolean;
   setShowQuad: (v: boolean) => void;
-  onQuadChange?: (q: Point[]) => void; // no se usa aquí, pero lo dejamos por si lo necesitas
+  onQuadChange?: (q: Point[]) => void; // reservado para futuro uso
 };
 
 export default function Sidebar({
@@ -21,18 +24,32 @@ export default function Sidebar({
   showQuad,
   setShowQuad,
 }: SidebarProps) {
-  const [quality, setQuality] = useState(1);
-  const handleExport = () => {
-    const canvas = document.querySelector("canvas");
-    if (!canvas) return;
+  const [quality, setQuality] = useState<number>(1);
 
-    // nombre con id de valla + timestamp
+  const getCanvas = (): HTMLCanvasElement | null =>
+    document.querySelector("canvas");
+
+  const buildFileName = () => {
     const ts = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
-    const fileName = `sim_${valla.id}_${ts}`;
+    return `sim_${valla.id}_${ts}`;
+  };
 
-    exportCanvasWithWatermark(canvas as HTMLCanvasElement, {
+  const handleExportDownload = () => {
+    const canvas = getCanvas();
+    if (!canvas) return;
+    exportCanvasWithWatermark(canvas, {
       scale: quality,
-      fileName,
+      fileName: buildFileName(),
+      watermark: "Publilatina · Simulación",
+    });
+  };
+
+  const handleExportOpenNewTab = () => {
+    const canvas = getCanvas();
+    if (!canvas) return;
+    exportCanvasWithWatermarkOpenInNewTab(canvas, {
+      scale: quality,
+      fileName: buildFileName(),
       watermark: "Publilatina · Simulación",
     });
   };
@@ -67,9 +84,9 @@ export default function Sidebar({
         <p className="text-xs text-gray-500">JPG/PNG hasta 8MB</p>
       </div>
 
-      
+      {/* Toggles */}
       <div className="space-y-2 mb-5">
-      {/* Toggles 
+        {/* 
         <label className="flex items-center gap-2 text-sm text-gray-300">
           <input
             type="checkbox"
@@ -77,8 +94,8 @@ export default function Sidebar({
             onChange={(e) => setEditMode(e.target.checked)}
           />
           Modo editor (clic en 4 esquinas)
-        </label>*/}
-
+        </label>
+        */}
         <label className="flex items-center gap-2 text-sm text-gray-300">
           <input
             type="checkbox"
@@ -96,23 +113,36 @@ export default function Sidebar({
           <select
             className="bg-gray-800/80 text-gray-100 border border-gray-700 rounded px-2 py-1"
             value={quality}
-            onChange={(e) => setQuality(Number(e.target.value))}
+            onChange={(e) => setQuality(parseInt(e.target.value, 10))}
           >
             <option value={1}>1x</option>
             <option value={2}>2x</option>
           </select>
         </div>
 
-        <button
-          onClick={handleExport}
-          className="w-full bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-3 py-2 transition"
-        >
-          Descargar PNG
-        </button>
+        <div className="grid grid-cols-2 gap-2">
+          <button
+            onClick={handleExportDownload}
+            className="w-full bg-blue-600 hover:bg-blue-500 text-white rounded-lg px-3 py-2 transition"
+            title="Descarga directa (puede estar bloqueada dentro de algunos iframes)"
+          >
+            Descargar PNG
+          </button>
+
+          <button
+            onClick={handleExportOpenNewTab}
+            className="w-full bg-slate-700 hover:bg-slate-600 text-white rounded-lg px-3 py-2 transition"
+            title="Abre la imagen en una pestaña nueva por si la descarga directa está bloqueada"
+          >
+            Abrir en pestaña
+          </button>
+        </div>
       </div>
 
       <p className="mt-4 text-[11px] leading-4 text-gray-500">
-        Privacidad: Ningún dato será recogido por nuestro aplicativo.
+        ¿Problemas para descargar dentro del sitio? Usa <b>“Abrir en pestaña”</b> y guarda la imagen.
+        <br />
+        Privacidad: ningún dato es almacenado por este aplicativo.
       </p>
     </aside>
   );
