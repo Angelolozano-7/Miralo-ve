@@ -70,8 +70,9 @@ export default function Sidebar({
         <p className="text-xs text-gray-500">JPG/PNG hasta 8MB</p>
       </div>
 
-      {/* Toggles */}
+      
       <div className="space-y-2 mb-5">
+      {/* Toggles 
         <label className="flex items-center gap-2 text-sm text-gray-300">
           <input
             type="checkbox"
@@ -79,7 +80,7 @@ export default function Sidebar({
             onChange={(e) => setEditMode(e.target.checked)}
           />
           Modo editor (clic en 4 esquinas)
-        </label>
+        </label>*/}
 
         <label className="flex items-center gap-2 text-sm text-gray-300">
           <input
@@ -114,7 +115,7 @@ export default function Sidebar({
       </div>
 
       <p className="mt-4 text-[11px] leading-4 text-gray-500">
-        Privacidad: todo ocurre en tu navegador; no se sube nada.
+        Privacidad: Ningún dato será recogido por nuestro aplicativo.
       </p>
     </aside>
   );
